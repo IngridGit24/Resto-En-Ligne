@@ -1,0 +1,44 @@
+#version: "3"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: laravel_backend
+    ports:
+      - "8000:9000"
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: react_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: resto_en_ligne
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

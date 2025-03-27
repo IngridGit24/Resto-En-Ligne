@@ -1,0 +1,38 @@
+command for laravel :
+
+
+
+command for react :
+    -npx create-react-app my-app
+    -npm start
+    -npm run build
+    -npm install
+    -npm install --save react-router-dom
+    -npm install --save axios
+    -npm install --save redux react-redux
+    -npm install --save redux-thunk
+
+
+command for docker :
+    -docker init
+    -docker compose up -d
+    -docker compose down
+    -docker compose build
+    -docker compose exec app bash
+    -docker compose exec db bash
+    -docker compose exec nginx bash
+    -docker compose exec redis bash
+    -docker compose exec queue
+
+
+command for git and github :
+    - git init
+    - git add .
+    - git commit -m "initial commit"
+    - git push origin main
+    - git pull origin main
+    - git clone ...
+    - git status
+    - git branch
+    - git checkout -b branch-name
+    - git merge branch
