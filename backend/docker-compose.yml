@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+    app:
+        build:
+            args:
+                user: sammy
+                uid: 1000
+            context: ./backend
+            dockerfile: Dockerfile
+        image: laravel_backend
+        container_name: laravel-app
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./backend:/var/www
+        networks:
+            - backend-network
+        depends_on:
+            - db
+
+    db:
+        image: mysql:8
+        container_name: mysql_db
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_DATABASE: resto_en_ligne
+        volumes:
+            - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+            - laravel-mysql-data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        networks:
+            - backend-network
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    nginx:
+        image: nginx:alpine
+        container_name: laravel-nginx
+        restart: unless-stopped
+        ports:
+            - 127.0.0.1:8000:80
+        volumes:
+            - ./backend:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d/
+        networks:
+            - backend-network
+        depends_on:
+            - app
+
+networks:
+    backend-network:
+        driver: bridge
+
+volumes:
+    laravel-mysql-data:
