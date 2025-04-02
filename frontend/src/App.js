@@ -1,11 +1,16 @@
-import "./App.css";
-function App() {
+import React from "react";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Body from "./components/Body";
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1 className="welcome-text">Welcome to Resto-En-Ligne</h1>
-      </header>
+    <div className="d-flex flex-column min-vh-100">
+      <Navbar />
+      <div className="flex-grow-1 d-flex">
+        <Body />
+      </div>
+      <Footer />
     </div>
   );
-}
+};
 export default App;

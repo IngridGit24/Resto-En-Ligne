@@ -1,43 +1,45 @@
-import React, { useState } from "react";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Navbar.css";
-
+import "./Css/Navbar.css";
 const Navbar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
   return (
-    <div
-      className={`d-flex flex-column bg-dark text-white ${
-        isCollapsed ? "collapsed" : ""
-      }`}
-      style={{
-        width: isCollapsed ? "60px" : "200px",
-        transition: "width 0.3s",
-      }}
-    >
-      <button className="btn btn-dark text-light" onClick={toggleCollapse}>
-        Menu
-      </button>
-      <ul className={`list-unstyled ${isCollapsed ? "d-none" : ""}`}>
-        <li className="nav-item">
-          <a className="nav-link text-white" href="#home">
-            Home
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link text-white" href="#about">
-            About
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link text-white" href="#Resto">
-            Resto
-          </a>
-        </li>
-      </ul>
-    </div>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div className="container-fluid">
+        <a className="navbar-brand" href="#home">
+          Resto-En-Ligne
+        </a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <a className="nav-link" href="#home">
+                Home
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#about">
+                About
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#Resto">
+                Resto
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
   );
 };
 export default Navbar;
