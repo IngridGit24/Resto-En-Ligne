@@ -14,8 +14,8 @@ services:
         working_dir: /var/www/html
         volumes:
             - .:/var/www/html
-            - ./storage:/var/www/html/storage # Ensure proper storage permissions
-            - ./bootstrap/cache:/var/www/html/bootstrap/cache # Cache should be persistent
+            - ./storage:/var/www/html/storage
+            - ./bootstrap/cache:/var/www/html/bootstrap/cache
         networks:
             - app-network
         depends_on:
@@ -58,7 +58,7 @@ services:
             - "8080:80"
         volumes:
             - .:/var/www/html
-            - ./docker-compose/nginx:/etc/nginx/conf.d/ # Make sure correct path is set
+            - ./docker-compose/nginx:/etc/nginx/conf.d/
         networks:
             - app-network
         depends_on:
