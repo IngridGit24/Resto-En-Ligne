@@ -3,36 +3,47 @@ version: "3.8"
 services:
     app:
         build:
-            args:
-                user: sammy
-                uid: 1000
-            context: ./backend
+            context: ./
             dockerfile: Dockerfile
+            args:
+                user: laravel
+                uid: 2000
         image: laravel_backend
         container_name: laravel-app
         restart: unless-stopped
-        working_dir: /var/www
+        working_dir: /var/www/html
         volumes:
-            - ./backend:/var/www
+            - .:/var/www/html
+            - ./storage:/var/www/html/storage # Ensure proper storage permissions
+            - ./bootstrap/cache:/var/www/html/bootstrap/cache # Cache should be persistent
         networks:
-            - backend-network
+            - app-network
         depends_on:
-            - db
+            db:
+                condition: service_healthy
+        expose:
+            - "9000"
+        healthcheck:
+            test: ["CMD", "php", "-v"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
 
     db:
-        image: mysql:8
+        image: mysql:8.0
         container_name: mysql_db
         restart: unless-stopped
         environment:
-            MYSQL_ROOT_PASSWORD: root_password
-            MYSQL_DATABASE: resto_en_ligne
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: 1234
+            MYSQL_PASSWORD: 1234
+            MYSQL_USER: laravel
         volumes:
-            - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-            - laravel-mysql-data:/var/lib/mysql
+            - dbdata:/var/lib/mysql
+        networks:
+            - app-network
         ports:
             - "3306:3306"
-        networks:
-            - backend-network
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             interval: 10s
@@ -41,21 +52,22 @@ services:
 
     nginx:
         image: nginx:alpine
-        container_name: laravel-nginx
+        container_name: nginx
         restart: unless-stopped
         ports:
-            - 127.0.0.1:8000:80
+            - "8080:80"
         volumes:
-            - ./backend:/var/www
-            - ./docker-compose/nginx:/etc/nginx/conf.d/
+            - .:/var/www/html
+            - ./docker-compose/nginx:/etc/nginx/conf.d/ # Make sure correct path is set
         networks:
-            - backend-network
+            - app-network
         depends_on:
-            - app
+            app:
+                condition: service_healthy
 
 networks:
-    backend-network:
+    app-network:
         driver: bridge
 
 volumes:
-    laravel-mysql-data:
+    dbdata:
