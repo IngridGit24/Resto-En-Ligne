@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Body from "./components/Body";
+
 const App = () => {
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -13,4 +14,5 @@ const App = () => {
     </div>
   );
 };
+
 export default App;
