@@ -1,11 +1,9 @@
 # Dockerfile for Frontend
-FROM node:16
+FROM node:20
 WORKDIR /app
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 COPY . ./
 RUN npm run build
 CMD ["npx", "serve", "-s", "build"]
-EXPOSE 3000
-
-
+EXPOSE  3000
