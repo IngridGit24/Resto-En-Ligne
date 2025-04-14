@@ -10,6 +10,7 @@
 
 <body>
     <h1 style="text-align: center"> Welcome to Resto-En-Ligne </h1>
+    <div style="text-align: center">Your Backend is running properly</div>
 </body>
 
 </html>

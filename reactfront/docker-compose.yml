@@ -1,0 +1,14 @@
+# docker-compose.yml for frontend
+services:
+  frontend:
+    build:
+      context: ./
+    container_name: frontend_react
+    ports:
+      - "3000:80"
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge

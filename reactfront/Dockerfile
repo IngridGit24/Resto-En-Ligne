@@ -1,5 +1,5 @@
-# Dockerfile for Frontend
-FROM node:20
+# Build Stage
+FROM node:18 AS build
 WORKDIR /app
 COPY package*.json ./
 
@@ -7,9 +7,12 @@ COPY package*.json ./
 RUN npm install axios react-router-dom bootstrap react-bootstrap @fortawesome/fontawesome-free react-router-bootstrap
 RUN npm install
 
-COPY . ./
+
+COPY . .
 RUN npm run build
 
-# Serve the built application
-CMD ["npx", "serve", "-s", "build"]
-EXPOSE 3000
+# Production Stage with Nginx
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY ./nginx/frontend.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
