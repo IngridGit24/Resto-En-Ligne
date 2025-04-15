@@ -8,6 +8,11 @@ use App\Models\Restaurant;
 
 class RestoManager extends Controller
 {
+    public function welcome()
+    {
+        return view('welcome');
+    }
+
     //---------------------------- MENU HERE ---------------------------------------//
     // Display all menus
     public function index()
