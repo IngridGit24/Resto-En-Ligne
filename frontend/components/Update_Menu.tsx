@@ -1,10 +1,21 @@
-import React, { useState } from "react";
-import { Container, Form, Button, Alert, Row, Col } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Form,
+  Button,
+  Alert,
+  Spinner,
+  Row,
+  Col,
+} from "react-bootstrap";
 import API from "../src/api/axios";
 
-const AddMenuComponent = () => {
-  const [menuData, setMenuData] = useState({
+const UpdateMenuComponent = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [menu, setMenu] = useState({
     name: "",
     restaurant_id: "",
     image: "",
@@ -14,38 +25,42 @@ const AddMenuComponent = () => {
     price: "",
   });
 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setMenuData({ ...menuData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    API.get(`/menus/${id}`)
+      .then((response) => setMenu(response.data))
+      .catch(() => setError("Failed to load menu."))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setMenu({ ...menu, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
     try {
-      const response = await API.post("/menus", menuData);
-      if (response.status === 201 || response.status === 200) {
-        navigate("/menus");
-      } else {
-        setError("Unexpected response. Please try again.");
-      }
-    } catch (error: any) {
-      console.error("API Error:", error.response?.data || error.message);
-      if (error.response?.status === 419) {
-        setError("CSRF token mismatch! Try refreshing the page.");
-      } else {
-        setError("Failed to add menu. Please try again.");
-      }
+      await API.put(`/menus/${id}`, menu);
+      setSuccess(true);
+      setTimeout(() => navigate("/menus"), 1000);
+    } catch (err) {
+      setError("Update failed.");
     }
   };
 
+  if (loading)
+    return <Spinner animation="border" className="d-block mx-auto mt-5" />;
+
   return (
     <Container className="mt-3">
-      <h2>Add New Menu</h2>
+      <h2>Update Menu</h2>
       {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">Menu updated successfully!</Alert>}
 
       <Row>
         <Col md={6}>
@@ -55,7 +70,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 type="text"
                 name="name"
-                value={menuData.name}
+                value={menu.name}
                 onChange={handleChange}
                 required
               />
@@ -65,7 +80,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 type="text"
                 name="restaurant_id"
-                value={menuData.restaurant_id}
+                value={menu.restaurant_id}
                 onChange={handleChange}
                 required
               />
@@ -75,7 +90,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 type="text"
                 name="image"
-                value={menuData.image}
+                value={menu.image}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -84,7 +99,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 type="text"
                 name="category"
-                value={menuData.category}
+                value={menu.category}
                 onChange={handleChange}
                 required
               />
@@ -94,7 +109,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 as="textarea"
                 name="ingredients"
-                value={menuData.ingredients}
+                value={menu.ingredients}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -103,7 +118,7 @@ const AddMenuComponent = () => {
               <Form.Control
                 as="textarea"
                 name="description"
-                value={menuData.description}
+                value={menu.description}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -112,20 +127,23 @@ const AddMenuComponent = () => {
               <Form.Control
                 type="number"
                 name="price"
-                value={menuData.price}
+                value={menu.price}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
-            <Button variant="success" type="submit" className="mt-3">
-              Add Menu
+            <Button variant="primary" type="submit" className="mt-3">
+              Update Menu
             </Button>
           </Form>
         </Col>
-        <Col md={6} className="pt-5 mt-5" >
+        <Col md={6} className="pt-5 mt-5">
           <img
-            src="https://irp.cdn-website.com/deafcbd6/dms3rep/multi/1B3A8109+2-d26305a4.jpg"
-            alt="Menu Image"
+            src={
+              menu.image ||
+              "https://irp.cdn-website.com/deafcbd6/dms3rep/multi/1B3A8109+2-d26305a4.jpg"
+            }
+            alt="Menu Preview"
             className="img-fluid rounded"
             style={{ maxWidth: "50%" }}
           />
@@ -135,4 +153,4 @@ const AddMenuComponent = () => {
   );
 };
 
-export default AddMenuComponent;
+export default UpdateMenuComponent;

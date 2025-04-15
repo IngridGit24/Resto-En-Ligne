@@ -44,10 +44,10 @@ const AddRestaurantComponent = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <h2>Add New Restaurant</h2>
+    <Container className="mt-3 row center">
+      <h2 className="mb-5">Add New Restaurant</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} className="col-md-6">
         <Form.Group controlId="restaurantName">
           <Form.Label>Name</Form.Label>
           <Form.Control type="text" name="name" value={restaurantData.name} onChange={handleChange} required />
@@ -82,6 +82,15 @@ const AddRestaurantComponent = () => {
         </Form.Group>
         <Button variant="success" type="submit" className="mt-3">Add Restaurant</Button>
       </Form>
+      <div className="col-md-6 pt-5 mt-5">
+        <img
+          src="https://irp.cdn-website.com/deafcbd6/dms3rep/multi/1B3A8109+2-d26305a4.jpg"
+          alt="Restaurant"
+          className="img-fluid mt-4"
+          style={{ borderRadius: "8px", maxHeight: "350px", objectFit: "cover" }}
+        />
+      </div>
+
     </Container>
   );
 };
