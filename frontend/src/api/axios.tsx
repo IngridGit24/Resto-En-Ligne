@@ -42,7 +42,7 @@ api.interceptors.request.use(
   }
 );
 
-// 🚨 Improved Global Error Handling
+// 🚨 Global Error Handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -50,14 +50,13 @@ api.interceptors.response.use(
 
     if (error.response?.status === 419) {
       console.warn("⚠️ CSRF token mismatch! Try refreshing the page.");
-      getCsrfToken(); // Automatically refetch CSRF cookie if mismatch occurs
+      getCsrfToken();
     }
 
     return Promise.reject(error);
   }
 );
 
-// Fetch CSRF token at the start of the app
-getCsrfToken();
-
+// ✅ Export both api and CSRF utility
+export { getCsrfToken };
 export default api;
