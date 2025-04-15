@@ -1,0 +1,48 @@
+# Version control
+.git
+.github
+.gitignore
+.gitattributes
+
+# Dependencies
+/node_modules
+/vendor
+*.lock
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Development files
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/*
+/bootstrap/cache/*
+.phpunit.result.cache
+phpunit.xml
+README.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+docker
+
+# IDE files
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+_ide_helper.php
+.phpstorm.meta.php
+
+# Build artifacts
+/public/hot
+/public/storage
+/public/css
+/public/js
+/public/build
+/public/mix-manifest.json
