@@ -1,12 +1,36 @@
+/* App.css */
+
+/* Ensures full height layout */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Page spacing: matches navbar and footer height */
 body {
-  padding-top: 150px; 
+  padding-top: 150px;
   padding-bottom: 150px;
 }
 
+/* App wrapper uses flexbox for vertical structure */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Middle content styling */
 .main-container {
-  /* display: flex; */
-  /* flex-direction: column; */
-  justify-content: center; 
-  align-items: center; 
+  flex: 1;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  display: flex; /* Re-enabled to center vertically if needed */
+  flex-direction: column;
+}
+
+/* Optional: ensure footer doesn't shrink */
+footer {
+  flex-shrink: 0;
 }

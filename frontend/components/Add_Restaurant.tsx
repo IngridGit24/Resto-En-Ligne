@@ -15,18 +15,32 @@ const AddRestaurantComponent = () => {
     images: "",
   });
 
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRestaurantData({ ...restaurantData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    API.post("/restaurants", restaurantData)
-      .then(() => navigate("/restaurants"))
-      .catch(_error => setError("Failed to add restaurant. Please try again."));
+    setError(null);
+
+    try {
+      const response = await API.post("/restaurants", restaurantData);
+      if (response.status === 201 || response.status === 200) {
+        navigate("/restaurants");
+      } else {
+        setError("Unexpected response. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("API Error:", error.response?.data || error.message);
+      if (error.response?.status === 419) {
+        setError("CSRF token mismatch! Try refreshing the page.");
+      } else {
+        setError("Failed to add restaurant. Please try again.");
+      }
+    }
   };
 
   return (
