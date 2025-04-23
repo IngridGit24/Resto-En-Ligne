@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getRequest, postRequest, putRequest, deleteRequest } from "../Core/ApiProvider";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "react-toastify/dist/ReactToastify.css";
-
 function Dashboard() {
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
