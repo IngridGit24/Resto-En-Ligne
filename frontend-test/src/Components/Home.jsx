@@ -94,19 +94,19 @@ const Home = () => {
                                     <h5 className="card-title">{restaurant.name}</h5>
                                     <p className="card-text">{restaurant.city}</p>
                                     <div className="d-flex justify-content-center gap-2">
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => navigate(`/menus?restaurant=${restaurant.id}`)}
-                                        >
-                                            View Menu
-                                        </button>
-                                        <button
-                                            className="btn btn-success"
-                                            onClick={() => navigate(`/menus?restaurant=${restaurant.id}`)}
-                                        >
-                                            Order
-                                        </button>
-                                    </div>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => navigate(`/menus?restaurant=${restaurant.id}`)}
+                            >
+                                View Menu
+                            </button>
+                            <button
+                                className="btn btn-success"
+                                onClick={() => navigate(`/menus?restaurant=${restaurant.id}`)}
+                            >
+                                Order
+                            </button>
+                        </div>
                                 </div>
                             </div>
                         </div>
