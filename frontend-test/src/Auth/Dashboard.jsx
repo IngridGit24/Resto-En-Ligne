@@ -1,136 +1,143 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getRequest, postRequest, putRequest, deleteRequest } from "../Core/ApiProvider";
 import { toast } from "react-toastify";
+import { getRequest, postRequest, putRequest, deleteRequest } from "../Core/ApiProvider";
 
-const Dashboard = () => {
-    const navigate = useNavigate();
-    const [currentUser, setCurrentUser] = useState(null);
-    const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
-    const [editUser, setEditUser] = useState(null);
-    const [loading, setLoading] = useState(false);
+function Dashboard() {
+  const [users, setUsers] = useState([]);
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [editingUserId, setEditingUserId] = useState(null);
 
-    // Fetch logged-in user & all users
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-            navigate("/login");
-        } else {
-            setCurrentUser(JSON.parse(storedUser));
-        }
+  // Fetch users when component mounts
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-        const fetchUsers = async () => {
-            setLoading(true);
-            try {
-                const response = await getRequest("/users");
-                setUsers(response);
-            } catch (error) {
-                console.error("Error fetching users:", error);
-                toast.error("Failed to fetch users.");
-            } finally {
-                setLoading(false);
-            }
-        };
+  const fetchUsers = async () => {
+    try {
+      const data = await getRequest("/users");
+      // If the response is wrapped in an object with a 'users' key
+      setUsers(data.users || data); // Handle both cases (data.users or directly an array)
+    } catch (error) {
+      toast.error("Failed to load users.");
+    }
+  };
 
-        fetchUsers();
-    }, [navigate]);
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    // Handle new user creation
-    const handleCreateUser = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await postRequest("/users", newUser);
-            setUsers([...users, response]); // Update state
-            setNewUser({ name: "", email: "", password: "" }); // Reset form
-            toast.success("User created successfully!");
-        } catch (error) {
-            console.error("Error creating user:", error);
-            toast.error("Failed to create user.");
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = { ...formData };
 
-    // Handle user update
-    const handleUpdateUser = async (e) => {
-        e.preventDefault();
-        try {
-            await putRequest(`/users/${editUser.id}`, editUser);
-            setUsers(users.map(user => user.id === editUser.id ? editUser : user));
-            setEditUser(null);
-            toast.success("User updated successfully!");
-        } catch (error) {
-            console.error("Error updating user:", error);
-            toast.error("Failed to update user.");
-        }
-    };
+    if (!editingUserId && !payload.password) {
+      toast.error("Password is required.");
+      return;
+    }
 
-    // Handle user deletion
-    const handleDeleteUser = async (id) => {
-        try {
-            await deleteRequest(`/users/${id}`);
-            setUsers(users.filter(user => user.id !== id)); // Remove from state
-            toast.success("User deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            toast.error("Failed to delete user.");
-        }
-    };
+    // Remove password if blank when editing
+    if (editingUserId && !payload.password) {
+      delete payload.password;
+    }
 
-    return (
-        <div className="container mt-5 text-center">
-            {currentUser ? (
-                <>
-                    <h2>Welcome, {currentUser.name} 👋</h2>
-                    <p>Email: {currentUser.email}</p>
+    try {
+      if (editingUserId) {
+        await putRequest(`/users/${editingUserId}`, payload);
+        toast.success("User updated successfully!");
+        setEditingUserId(null);
+      } else {
+        await postRequest("/users", payload);
+        toast.success("User created successfully!");
+      }
 
-                    {/* Create New User */}
-                    <form className="mt-4" onSubmit={handleCreateUser}>
-                        <h4>Add New User</h4>
-                        <input type="text" placeholder="Name" className="form-control my-2" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} required />
-                        <input type="email" placeholder="Email" className="form-control my-2" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} required />
-                        <input type="password" placeholder="Password" className="form-control my-2" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} required />
-                        <button className="btn btn-success" disabled={loading}>Create User</button>
-                    </form>
+      setFormData({ name: "", email: "", password: "" });
+      fetchUsers();
+    } catch (error) {
+      toast.error("Something went wrong.");
+    }
+  };
 
-                    {/* Edit User */}
-                    {editUser && (
-                        <form className="mt-4" onSubmit={handleUpdateUser}>
-                            <h4>Edit User</h4>
-                            <input type="text" className="form-control my-2" value={editUser.name} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} required />
-                            <input type="email" className="form-control my-2" value={editUser.email} onChange={(e) => setEditUser({ ...editUser, email: e.target.value })} required />
-                            <button className="btn btn-warning" disabled={loading}>Update User</button>
-                        </form>
-                    )}
+  const handleEdit = (user) => {
+    setEditingUserId(user.id);
+    setFormData({ name: user.name, email: user.email, password: "" });
+  };
 
-                    {/* Users List */}
-                    <h3 className="mt-5">Users List</h3>
-                    <table className="table mt-3">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>
-                                        <button className="btn btn-warning me-2" onClick={() => setEditUser(user)}>Edit</button>
-                                        <button className="btn btn-danger" onClick={() => handleDeleteUser(user.id)}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </>
-            ) : (
-                <h2>Redirecting to Login...</h2>
-            )}
-        </div>
-    );
-};
+  const handleDelete = async (id) => {
+    try {
+      await deleteRequest(`/users/${id}`);
+      toast.success("User deleted successfully!");
+      fetchUsers();
+    } catch (error) {
+      toast.error("Failed to delete user.");
+    }
+  };
+
+  return (
+    <div className="container mt-5">
+      <h2>User Management Dashboard</h2>
+
+      {/* User Form */}
+      <form onSubmit={handleSubmit} className="mb-4">
+        <input
+          type="text"
+          name="name"
+          className="form-control my-2"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          className="form-control my-2"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          className="form-control my-2"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleInputChange}
+          required={!editingUserId}
+        />
+        <button className="btn btn-success" type="submit">
+          {editingUserId ? "Update User" : "Add User"}
+        </button>
+      </form>
+
+      {/* User List */}
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>
+                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEdit(user)}>
+                  Edit
+                </button>
+                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDelete(user.id)}>
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default Dashboard;

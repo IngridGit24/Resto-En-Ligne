@@ -1,9 +1,15 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const PrivateRoute = () => {
-    const token = localStorage.getItem("token"); 
+const PrivateRoute = ({ children }) => {
+    const token = localStorage.getItem("token");
 
-    return token ? <Outlet /> : <Navigate to="/login" replace />;
+    if (!token) {
+        // Redirect to login page if no token found
+        return <Navigate to="/login" />;
+    }
+
+    // If token exists, allow access to the protected route
+    return children;
 };
 
 export default PrivateRoute;

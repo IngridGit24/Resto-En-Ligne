@@ -1,110 +1,105 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { postRequest } from "../Core/ApiProvider";
 import { FaUserCircle } from "react-icons/fa";
-import { getRequest, postRequest } from "../Core/ApiProvider";
+import { useAuth } from "../Auth/AuthContext";
 
 const NavbarComponent = () => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
 
-    // This effect runs once on component mount to load the user from localStorage
-    useEffect(() => {
-        const fetchUser = async () => {
-            const storedUser = localStorage.getItem("user");
-            if (!storedUser) {
-                setUser(null);
-                return;
-            }
+  const handleLogout = async () => {
+    try {
+      await postRequest("/logout");
+    } catch (error) {
+      console.error("Logout failed:", error.response?.data || error.message);
+    } finally {
+      logout();
+      navigate("/login");
+    }
+  };
 
-            try {
-                const parsedUser = JSON.parse(storedUser); // Safely parse JSON
-                if (parsedUser?.id) {
-                    const response = await getRequest(`/users/${parsedUser.id}`);
-                    setUser(response);
-                } else {
-                    setUser(null);
-                }
-            } catch (error) {
-                console.error("Failed to fetch user:", error);
-                localStorage.removeItem("user");
-                setUser(null);
-            }
-        };
+  return (
+    <>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div className="container-fluid">
+          <Link className="navbar-brand" to="/">Resto-En-Ligne</Link>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav me-auto">
+              <li className="nav-item"><Link className="nav-link" to="/">Home</Link></li>
+              <li className="nav-item"><Link className="nav-link" to="/restaurants">Restaurants</Link></li>
+              <li className="nav-item"><Link className="nav-link" to="/menus">Menus</Link></li>
+            </ul>
 
-        fetchUser();
+            <ul className="navbar-nav">
+              {user ? (
+                <>
+                  <li className="nav-item">
+                    <Link className="btn btn-info me-3" to="/dashboard">Dashboard</Link>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className="btn btn-success me-3"
+                      onClick={() => setShowProfile(true)}
+                      aria-haspopup="dialog"
+                    >
+                      <FaUserCircle className="me-1" /> Profile
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="nav-item"><Link className="btn btn-primary me-3" to="/login">Login</Link></li>
+                  <li className="nav-item"><Link className="btn btn-success" to="/register">Register</Link></li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+      </nav>
 
-        // Listen for changes in localStorage to update user state when it changes
-        const handleStorageChange = () => {
-            const storedUser = localStorage.getItem("user");
-            setUser(storedUser ? JSON.parse(storedUser) : null);
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-
-        // Clean up the event listener when the component unmounts
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []); // Dependency array is empty, so this effect runs only once
-
-    const handleLogout = async () => {
-        try {
-            await postRequest("/logout");
-            localStorage.clear();  // Clear all localStorage data
-            setUser(null);  // Clear the user state
-            navigate("/login");  // Redirect to login page
-        } catch (error) {
-            console.error("Logout failed:", error.response?.data || error.message);
-        }
-    };
-
-    return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top py-3">
-            <div className="container-fluid">
-                <Link className="navbar-brand fw-bold fs-2" to="/">Resto-En-Ligne</Link>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link className="nav-link fs-4" to="/">Home</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link fs-4" to="/contacts">Contacts</Link>
-                        </li>
-                    </ul>
-
-                    <ul className="navbar-nav ms-auto">
-                        {user ? (
-                            <>
-                                <li className="nav-item">
-                                    <Link className="btn btn-info me-3" to="/dashboard">Dashboard</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <button className="btn btn-success me-3">
-                                        <FaUserCircle className="me-1" /> {user.name}
-                                    </button>
-                                </li>
-                                <li className="nav-item">
-                                    <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-                                </li>
-                            </>
-                        ) : (
-                            <>
-                                <li className="nav-item">
-                                    <Link className="btn btn-primary me-3" to="/login">Login</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="btn btn-success" to="/register">Register</Link>
-                                </li>
-                            </>
-                        )}
-                    </ul>
-                </div>
+      {/* Profile Modal */}
+      {showProfile && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="profileModalLabel"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="profileModalLabel">User Profile</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowProfile(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p><strong>Name:</strong> {user?.name}</p>
+                <p><strong>Email:</strong> {user?.email}</p>
+                <p><strong>Status:</strong> Logged in</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowProfile(false)}>Close</button>
+              </div>
             </div>
-        </nav>
-    );
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default NavbarComponent;

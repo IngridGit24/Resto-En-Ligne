@@ -97,7 +97,24 @@ class UsersController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $user->update($request->only(['name', 'email', 'password']));
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:4|max:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if (!empty($request->password)) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
 
         return response()->json(['message' => 'User updated successfully', 'user' => $user]);
     }
