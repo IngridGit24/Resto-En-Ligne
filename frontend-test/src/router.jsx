@@ -15,9 +15,14 @@ import PrivateRoute from "./Auth/PrivateRoute";
 import NotFound from "./Auth/NotFound";
 
 // Resto Pages
-import RestaurantComponent from "./Resto/Restaurant"; 
-import AddRestaurant from "./Resto/AddRestaurant"; 
-import UpdateRestaurant from "./Resto/UpdateRestaurant"; 
+import RestaurantComponent from "./Resto/Restaurant";
+import AddRestaurant from "./Resto/AddRestaurant";
+import UpdateRestaurant from "./Resto/UpdateRestaurant";
+
+// Menu Pages
+import MenuComponent from "./Menu/Menu";
+import AddMenuComponent from "./Menu/AddMenu";
+import UpdateMenuComponent from "./Menu/UpdateMenu"; 
 
 const RouterComponent = () => {
     return (
@@ -37,11 +42,15 @@ const RouterComponent = () => {
                     <Route path="/logout" element={<Logout />} />
 
                     {/* Restaurant Pages */}
-                    <Route path="/restaurants" element={<PrivateRoute><RestaurantComponent /></PrivateRoute>} /> 
-                    <Route path="/add-restaurant" element={<PrivateRoute><AddRestaurant /></PrivateRoute>} /> 
+                    <Route path="/restaurants" element={<PrivateRoute><RestaurantComponent /></PrivateRoute>} />
+                    <Route path="/add-restaurant" element={<PrivateRoute><AddRestaurant /></PrivateRoute>} />
                     <Route path="/update-restaurant/:id" element={<PrivateRoute><UpdateRestaurant /></PrivateRoute>} />
 
-
+                    {/* Menu Routes */}
+                    <Route path="/menus" element={<PrivateRoute><MenuComponent /></PrivateRoute>} />
+                    <Route path="/add-menu" element={<PrivateRoute><AddMenuComponent /></PrivateRoute>} />
+                    <Route path="/update-menu/:id" element={<PrivateRoute><UpdateMenuComponent /></PrivateRoute>} />
+                    
                     {/* Catch-All 404 Page */}
                     <Route path="*" element={<NotFound />} />
                 </Routes>
