@@ -1,14 +1,11 @@
-import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-function NotFound() {
-  return (
-    <div className="container text-center mt-5">
-      <h1 className="display-4">404 - Page Not Found</h1>
-      <p>The page you're looking for doesn't exist or has been moved.</p>
-      <Link to="/" className="btn btn-primary">Go Home</Link>
-    </div>
-  );
-}
+const NotFound = () => {
+    return (
+        <div className="container mt-5 text-center">
+            <h2>404 - Page Not Found</h2>
+            <p>The page you're looking for doesn't exist.</p>
+            <a href="/" className="btn btn-primary">Go Home</a>
+        </div>
+    );
+};
 
 export default NotFound;

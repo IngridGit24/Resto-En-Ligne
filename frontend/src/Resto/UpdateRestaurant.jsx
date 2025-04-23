@@ -47,7 +47,7 @@ const UpdateRestaurantComponent = () => {
     if (loading) return <div className="spinner-border d-block mx-auto mt-5"></div>;
 
     return (
-        <div className="container mt-3">
+        <div className="container mt-3 pb-5 pt-3">
             <h2>Update Restaurant</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">Restaurant updated successfully!</div>}
@@ -104,7 +104,9 @@ const UpdateRestaurantComponent = () => {
                         </div>
 
                         <button type="submit" className="btn btn-primary mt-3">Update Restaurant</button>
+                        <button className="btn btn-warning mt-3 ms-2" onClick={() => navigate(-1)}> Go Back </button>
                     </form>
+
                 </div>
 
                 {/* Image Preview */}

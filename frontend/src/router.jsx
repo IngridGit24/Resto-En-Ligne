@@ -1,57 +1,61 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-// Components
+// Componnents Pages
 import Home from "./Components/Home";
+import Contacts from "./Components/Contacts";
 import NavbarComponent from "./Components/Navbar";
-// import FooterComponent from "./Components/Footer"; 
+import FooterComponent from "./Components/Footer";
 
-// Restaurant Pages
+// Auth Pages 
+import Login from "./Auth/Login";
+import Register from "./Auth/Register";
+import Dashboard from "./Auth/Dashboard";
+import Logout from "./Auth/Logout";
+import PrivateRoute from "./Auth/PrivateRoute";
+import NotFound from "./Auth/NotFound";
+
+// Resto Pages
 import RestaurantComponent from "./Resto/Restaurant";
-import AddRestaurantComponent from "./Resto/AddRestaurant";
-import UpdateRestaurantComponent from "./Resto/UpdateRestaurant";
+import AddRestaurant from "./Resto/AddRestaurant";
+import UpdateRestaurant from "./Resto/UpdateRestaurant";
 
 // Menu Pages
 import MenuComponent from "./Menu/Menu";
 import AddMenuComponent from "./Menu/AddMenu";
-import UpdateMenuComponent from "./Menu/UpdateMenu";
-
-// Auth Pages
-import Register from "./Auth/Register";
-import Login from "./Auth/Login";
-import Dashboard from "./Auth/Dashboard";
-import PrivateRoute from "./Auth/PrivateRoute";
-import NotFound from "./Auth/NotFound"; 
+import UpdateMenuComponent from "./Menu/UpdateMenu"; 
 
 const RouterComponent = () => {
-    const token = localStorage.getItem("token"); 
-
     return (
         <>
-            <NavbarComponent /> 
+            <NavbarComponent />
             <div className="main-content pb-5">
                 <Routes>
+                    {/* Public Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
                     <Route path="/" element={<Home />} />
-                    <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Register />} />
-                    <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Login />} />
+                    <Route path="/contacts" element={<Contacts />} />
 
-                    {/* Private Dashboard Route */}
+
+                    {/* Protected Routes (Authenticated Users Only) */}
                     <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                    <Route path="/logout" element={<Logout />} />
 
-                    {/* Private Restaurant Routes */}
+                    {/* Restaurant Pages */}
                     <Route path="/restaurants" element={<PrivateRoute><RestaurantComponent /></PrivateRoute>} />
-                    <Route path="/add-restaurant" element={<PrivateRoute><AddRestaurantComponent /></PrivateRoute>} />
-                    <Route path="/update-restaurant/:id" element={<PrivateRoute><UpdateRestaurantComponent /></PrivateRoute>} />
+                    <Route path="/add-restaurant" element={<PrivateRoute><AddRestaurant /></PrivateRoute>} />
+                    <Route path="/update-restaurant/:id" element={<PrivateRoute><UpdateRestaurant /></PrivateRoute>} />
 
-                    {/* Private Menu Routes */}
+                    {/* Menu Routes */}
                     <Route path="/menus" element={<PrivateRoute><MenuComponent /></PrivateRoute>} />
                     <Route path="/add-menu" element={<PrivateRoute><AddMenuComponent /></PrivateRoute>} />
                     <Route path="/update-menu/:id" element={<PrivateRoute><UpdateMenuComponent /></PrivateRoute>} />
-
-                    {/* Catch-all Route for Undefined Paths */}
+                    
+                    {/* Catch-All 404 Page */}
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
-            {/* <FooterComponent /> */}
+            <FooterComponent />
         </>
     );
 };

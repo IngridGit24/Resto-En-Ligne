@@ -43,7 +43,7 @@ const AddRestaurantComponent = () => {
     };
 
     return (
-        <div className="container mt-3">
+        <div className="container mt-3 pb-5 pt-3">
             <h2 className="mb-5 text-center">Add New Restaurant</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             
@@ -99,6 +99,7 @@ const AddRestaurantComponent = () => {
                         </div>
 
                         <button type="submit" className="btn btn-success mt-3">Add Restaurant</button>
+                        <button className="btn btn-warning mt-3 ms-2" onClick={() => navigate(-1)}> Go Back </button>
                     </form>
                 </div>
 

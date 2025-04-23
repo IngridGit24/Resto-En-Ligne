@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "frontend-test",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,9 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
     "react": "^19.1.0",

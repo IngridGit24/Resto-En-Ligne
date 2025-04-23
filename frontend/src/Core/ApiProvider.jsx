@@ -1,70 +1,89 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
-// Base API instance
+// Create Axios instance
 const API = axios.create({
-    baseURL: "http://localhost:8000/api", 
+    baseURL: "http://localhost:8000/api",
     headers: {
         "Content-Type": "application/json",
     },
 });
 
-// Interceptor to attach token to every request (If user is logged in)
-API.interceptors.request.use((config) => {
+// Function to attach auth token dynamically
+const attachToken = () => {
     const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => Promise.reject(error));
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-// Enhanced error handling function
-const handleError = (error, method, url) => {
-    console.error(`${method.toUpperCase()} request failed (${url}):`, error.response?.data || error.message);
+// Function to handle token expiration
+const handleTokenExpiration = (error) => {
     if (error.response?.status === 401) {
-        console.warn("Unauthorized: Token may be expired or invalid.");
-        localStorage.removeItem("token"); // Ensure expired tokens are cleared
-        window.location.href = "/login"; // Redirect user to login
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";  // Redirect to login page
     }
+};
+
+// Generic error handler
+const handleRequestError = (error) => {
+    console.error("Request error:", error.response?.data || error.message);
+    if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+    } else {
+        toast.error("Something went wrong. Please try again later.");
+    }
+    handleTokenExpiration(error);  // Check for token expiration (401)
     throw error;
 };
 
-// Generic GET request
-export const getRequest = async (url, params = {}) => {
+// GET request function
+export const getRequest = async (endpoint, params = {}) => {
     try {
-        const response = await API.get(url, { params });
+        const response = await API.get(endpoint, { params, headers: attachToken() });
         return response.data;
     } catch (error) {
-        handleError(error, "get", url);
+        handleRequestError(error);
     }
 };
 
-// Generic POST request
-export const postRequest = async (url, data = {}) => {
+// POST request function
+export const postRequest = async (endpoint, data, options = {}) => {
     try {
-        const response = await API.post(url, data);
+        const response = await API.post(endpoint, data, { headers: attachToken(), ...options });
         return response.data;
     } catch (error) {
-        handleError(error, "post", url);
+        handleRequestError(error);
     }
 };
 
-// Generic PUT request
-export const putRequest = async (url, data = {}) => {
+// PUT request function (for full updates)
+export const putRequest = async (endpoint, data) => {
     try {
-        const response = await API.put(url, data);
+        const response = await API.put(endpoint, data, { headers: attachToken() });
         return response.data;
     } catch (error) {
-        handleError(error, "put", url);
+        handleRequestError(error);
     }
 };
 
-// Generic DELETE request
-export const deleteRequest = async (url) => {
+// PATCH request function (for partial updates)
+export const patchRequest = async (endpoint, data) => {
     try {
-        const response = await API.delete(url);
+        const response = await API.patch(endpoint, data, { headers: attachToken() });
         return response.data;
     } catch (error) {
-        handleError(error, "delete", url);
+        handleRequestError(error);
+    }
+};
+
+// DELETE request function
+export const deleteRequest = async (endpoint) => {
+    try {
+        const response = await API.delete(endpoint, { headers: attachToken() });
+        return response.data;
+    } catch (error) {
+        handleRequestError(error);
     }
 };
 

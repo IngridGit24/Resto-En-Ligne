@@ -15,7 +15,8 @@ function Dashboard() {
   const fetchUsers = async () => {
     try {
       const data = await getRequest("/users");
-      setUsers(data);
+      // If the response is wrapped in an object with a 'users' key
+      setUsers(data.users || data); // Handle both cases (data.users or directly an array)
     } catch (error) {
       toast.error("Failed to load users.");
     }
@@ -27,26 +28,33 @@ function Dashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingUserId) {
-      // Update existing user
-      try {
-        await putRequest(`/users/${editingUserId}`, formData);
+    const payload = { ...formData };
+
+    if (!editingUserId && !payload.password) {
+      toast.error("Password is required.");
+      return;
+    }
+
+    // Remove password if blank when editing
+    if (editingUserId && !payload.password) {
+      delete payload.password;
+    }
+
+    try {
+      if (editingUserId) {
+        await putRequest(`/users/${editingUserId}`, payload);
         toast.success("User updated successfully!");
         setEditingUserId(null);
-      } catch (error) {
-        toast.error("Failed to update user.");
-      }
-    } else {
-      // Create new user
-      try {
-        await postRequest("/users", formData);
+      } else {
+        await postRequest("/users", payload);
         toast.success("User created successfully!");
-      } catch (error) {
-        toast.error("Failed to create user.");
       }
+
+      setFormData({ name: "", email: "", password: "" });
+      fetchUsers();
+    } catch (error) {
+      toast.error("Something went wrong.");
     }
-    setFormData({ name: "", email: "", password: "" });
-    fetchUsers();
   };
 
   const handleEdit = (user) => {
@@ -95,7 +103,7 @@ function Dashboard() {
           placeholder="Password"
           value={formData.password}
           onChange={handleInputChange}
-          required={!editingUserId} 
+          required={!editingUserId}
         />
         <button className="btn btn-success" type="submit">
           {editingUserId ? "Update User" : "Add User"}
