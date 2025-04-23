@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 // Create Axios instance
 const API = axios.create({
@@ -14,14 +15,35 @@ const attachToken = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+// Function to handle token expiration
+const handleTokenExpiration = (error) => {
+    if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";  // Redirect to login page
+    }
+};
+
+// Generic error handler
+const handleRequestError = (error) => {
+    console.error("Request error:", error.response?.data || error.message);
+    if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+    } else {
+        toast.error("Something went wrong. Please try again later.");
+    }
+    handleTokenExpiration(error);  // Check for token expiration (401)
+    throw error;
+};
+
 // GET request function
 export const getRequest = async (endpoint, params = {}) => {
     try {
         const response = await API.get(endpoint, { params, headers: attachToken() });
         return response.data;
     } catch (error) {
-        console.error("GET request error:", error.response?.data || error.message);
-        throw error;
+        handleRequestError(error);
     }
 };
 
@@ -31,8 +53,7 @@ export const postRequest = async (endpoint, data, options = {}) => {
         const response = await API.post(endpoint, data, { headers: attachToken(), ...options });
         return response.data;
     } catch (error) {
-        console.error("POST request error:", error.response?.data || error.message);
-        throw error;
+        handleRequestError(error);
     }
 };
 
@@ -42,8 +63,7 @@ export const putRequest = async (endpoint, data) => {
         const response = await API.put(endpoint, data, { headers: attachToken() });
         return response.data;
     } catch (error) {
-        console.error("PUT request error:", error.response?.data || error.message);
-        throw error;
+        handleRequestError(error);
     }
 };
 
@@ -53,8 +73,7 @@ export const patchRequest = async (endpoint, data) => {
         const response = await API.patch(endpoint, data, { headers: attachToken() });
         return response.data;
     } catch (error) {
-        console.error("PATCH request error:", error.response?.data || error.message);
-        throw error;
+        handleRequestError(error);
     }
 };
 
@@ -64,8 +83,7 @@ export const deleteRequest = async (endpoint) => {
         const response = await API.delete(endpoint, { headers: attachToken() });
         return response.data;
     } catch (error) {
-        console.error("DELETE request error:", error.response?.data || error.message);
-        throw error;
+        handleRequestError(error);
     }
 };
 

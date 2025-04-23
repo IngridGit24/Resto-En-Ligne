@@ -51,3 +51,10 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/menus/{id}', [MenuController::class, 'updateMenu']);
     Route::delete('/menus/{id}', [MenuController::class, 'deleteMenu']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Add /api/me route for authenticated user details
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->get('/me', [UsersController::class, 'me']);

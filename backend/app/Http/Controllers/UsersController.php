@@ -114,4 +114,10 @@ class UsersController extends Controller
 
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+    // Get current authenticated user
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
+    }
 }

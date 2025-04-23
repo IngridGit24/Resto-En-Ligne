@@ -1,12 +1,22 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { postRequest } from "../Core/ApiProvider";
 
 const Logout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        localStorage.clear();
-        navigate("/login");
+        const logoutUser = async () => {
+            try {
+                await postRequest("/logout");
+                localStorage.clear();
+                navigate("/login");
+            } catch (error) {
+                console.error("Logout failed:", error.response?.data || error.message);
+            }
+        };
+
+        logoutUser();
     }, [navigate]);
 
     return (
