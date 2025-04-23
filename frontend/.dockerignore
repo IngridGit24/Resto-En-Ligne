@@ -1,0 +1,27 @@
+# Node modules (no need to copy them, they will be installed during build)
+node_modules
+npm-debug.log
+
+# Build directories (no need to copy build artifacts into the container)
+build
+dist
+
+# Vite specific files
+.vite
+.cache
+
+# Docker file and docker-compose.yml (not needed in the image)
+docker-compose.yml
+Dockerfile
+
+# Environment files (if sensitive data is stored in these files)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
