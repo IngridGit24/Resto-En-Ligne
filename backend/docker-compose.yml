@@ -1,0 +1,9 @@
+services:
+  backend:
+    build:
+      context: .
+    container_name: backend
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
