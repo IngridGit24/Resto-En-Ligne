@@ -7,27 +7,38 @@ const Home = () => {
     const [user, setUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [restaurants, setRestaurants] = useState([]);
-    const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+    const [filteredRestaurants, setFilteredRestaurants] = useState([]); // ✅ Added missing state
     const [popularMenus, setPopularMenus] = useState([
         { id: 1, name: "KFC", image: "https://example.com/kfc.jpg" },
         { id: 2, name: "McDonald's", image: "https://example.com/mcdonalds.jpg" },
         { id: 3, name: "Burger King", image: "https://example.com/burgerking.jpg" },
     ]);
 
-    // Retrieve user from localStorage & Fetch restaurants on mount
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+    
+        try {
+            if (storedUser) {
+                console.log("User found in localStorage:", storedUser);
+                setUser(JSON.parse(storedUser));
+            } else {
+                console.warn("No user found in localStorage.");
+                setUser(null);
+            }
+        } catch (error) {
+            console.error("Invalid JSON in localStorage:", error);
+            localStorage.removeItem("user");
+            setUser(null);
         }
-
+    
         getRequest("/restaurants")
             .then(data => {
                 setRestaurants(data);
-                setFilteredRestaurants(data); // Initial filtered data
+                setFilteredRestaurants(data);
             })
             .catch(error => console.error("Failed to fetch restaurants:", error));
     }, []);
+    
 
     // Handle search filtering
     const handleSearch = () => {
@@ -51,6 +62,7 @@ const Home = () => {
             <div className="input-group mb-4">
                 <input
                     type="text"
+                    name="search" // ✅ Added missing name attribute
                     className="form-control"
                     placeholder="Search restaurants..."
                     value={searchQuery}

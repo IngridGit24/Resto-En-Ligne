@@ -2,37 +2,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { postRequest } from "../Core/ApiProvider";
 import { FaUserCircle } from "react-icons/fa";
+import { getUserFromStorage } from "../utils/storage";
 
 const NavbarComponent = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(getUserFromStorage());
     const [showProfile, setShowProfile] = useState(false);
 
-    // Check if user is logged in and retrieve stored user data
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+        const handleStorageChange = () => setUser(getUserFromStorage());
+        window.addEventListener("storage", handleStorageChange);
+        return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
     const handleLogout = async () => {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            console.error("No valid token found, redirecting to login...");
+        try {
+            await postRequest("/logout");
             localStorage.clear();
             setUser(null);
             navigate("/login");
-            return;
-        }
-
-        try {
-            await postRequest("/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
-
-            localStorage.clear();
-            setUser(null);
-            navigate("/");
+            window.location.reload();
         } catch (error) {
             console.error("Logout failed:", error.response?.data || error.message);
         }
@@ -52,7 +41,6 @@ const NavbarComponent = () => {
                             <li className="nav-item"><Link className="nav-link" to="/restaurants">Restaurants</Link></li>
                             <li className="nav-item"><Link className="nav-link" to="/menus">Menus</Link></li>
                         </ul>
-
                         <ul className="navbar-nav">
                             {user ? (
                                 <>
@@ -79,7 +67,6 @@ const NavbarComponent = () => {
                 </div>
             </nav>
 
-            {/* Profile Modal */}
             {showProfile && user && (
                 <div className="modal fade show d-block" tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered">

@@ -29,9 +29,10 @@ function Register() {
       });
 
       if (response.token) {
-        localStorage.setItem("token", response.token); 
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user)); 
         toast.success("Registration successful! Logging in...");
-        navigate("/"); 
+        navigate("/");
       }
     } catch (error) {
       toast.error("Registration failed. Try again.");

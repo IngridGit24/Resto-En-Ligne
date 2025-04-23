@@ -30,7 +30,7 @@ const RouterComponent = () => {
             <NavbarComponent /> 
             <div className="main-content pb-5">
                 <Routes>
-                    <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Register />} />
                     <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Login />} />
 

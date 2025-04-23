@@ -1,12 +1,12 @@
-import RouterComponent from './router'
-import './App.css'
+import RouterComponent from './router';
+import './App.css';
 
 function App() {
-  return (
-    <>
-      <RouterComponent />
-    </>
-  )
+    return (
+        <>
+            <RouterComponent />
+        </>
+    );
 }
 
-export default App
+export default App;
