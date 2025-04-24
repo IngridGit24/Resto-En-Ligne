@@ -8,6 +8,13 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/var/www/html
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=restoDB
+      - DB_USERNAME=root
+      - DB_PASSWORD= 
 
   frontend:
     image: react_frontend
@@ -20,3 +27,12 @@ services:
     command: npm run dev
     environment:
       - VITE_PORT=5173
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes" 
+      MYSQL_DATABASE: restoDB
+    ports:
+      - "3306:3306"
