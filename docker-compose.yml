@@ -1,0 +1,22 @@
+services:
+  backend:
+    image: laravel_backend
+    container_name: backend
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+
+  frontend:
+    image: react_frontend
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    environment:
+      - VITE_PORT=5173

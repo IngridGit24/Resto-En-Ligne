@@ -1,80 +1,31 @@
+# Use PHP CLI base image
 FROM php:8.2-cli
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git unzip zip curl libzip-dev libonig-dev libxml2-dev \
+    git \
+    unzip \
+    zip \
+    curl \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
     && docker-php-ext-install zip pdo pdo_mysql
 
-# Install Composer
+# Install Composer (from official Composer image)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Set the working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy all project files to the container
 COPY . .
 
 # Install Laravel dependencies
-RUN composer install
+RUN composer install --no-interaction --prefer-dist
 
-# Expose port
+# Expose Laravel's default port
 EXPOSE 8000
 
 # Start Laravel development server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-#--------------------------------------------------------------Without Nginx
-
-
-
-
-# # Stage 1: PHP + Composer
-# FROM php:8.2-fpm-alpine AS build
-
-# # Install dependencies
-# RUN apk add --no-cache \
-#     bash \
-#     git \
-#     unzip \
-#     curl \
-#     nginx \
-#     supervisor \
-#     icu-dev \
-#     libzip-dev \
-#     libpng-dev \
-#     oniguruma-dev \
-#     && docker-php-ext-install pdo pdo_mysql mbstring zip intl
-
-# # Install Composer
-# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# # Set working directory
-# WORKDIR /var/www
-
-# # Copy app source
-# COPY . .
-
-# # Install Laravel dependencies
-# RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# # Set permissions
-# RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
-
-# # Stage 2: Runtime with PHP-FPM and Nginx
-# FROM php:8.2-fpm-alpine
-
-# # Install runtime dependencies
-# RUN apk add --no-cache nginx supervisor
-
-# COPY --from=build /var/www /var/www
-# WORKDIR /var/www
-
-# # Copy Nginx and Supervisor config
-# COPY ./nginx/default.conf /etc/nginx/http.d/default.conf
-
-# # Supervisor configuration
-# COPY ./supervisord.conf /etc/supervisord.conf
-
-# # Expose port
-# EXPOSE 80
-
-# CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
